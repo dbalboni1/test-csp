@@ -1,0 +1,116 @@
+
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+    <title>Live AQI</title>
+    <link rel="stylesheet" type="text/css" href="../style/navigation.css">
+    <style>
+    #myIframe {
+        position:fixed; 
+        top:-70px; 
+        left:0px; 
+        bottom:0px; 
+        right:auto; 
+        width:100%;
+        height:calc(120vh + 140px); /*using calc*/
+        border:none; 
+        margin:0; 
+        padding:0;
+        overflow:hidden;
+        z-index:-1;
+        background:blue;
+
+    }
+    </style>
+
+    <script src="../scripts/AQI-legend-script.js"></script>
+    <script>
+        window.onload = function() {
+            legendEventHandling();
+
+            // var airnow = require('airnow');
+            // var client = airnow({ apiKey: 'D048E18B-01B9-436A-A100-D951AA7435A8' });
+
+            // // build my options
+            // var options = {
+            //     zipCode: "99201",
+            //     date: new Date(),
+            //     distance: 100,
+            //     format: "application/json"
+            // };
+
+            // // get the forecast by zip
+            // client.getForecastByZipCode(options, function(err, forecast){
+            //     if (err){
+            //         console.log('derp! an error calling getForecastByZipCode: ' + err);
+            //     } else {
+            //         // the world is good! start processing the forecast
+            //         console.log(forecast)
+            //     }
+            // });
+        }
+
+    </script>
+</head>
+
+<body>
+    <div id="top-navigation">
+        <div id="branch-select-container">
+            <h2>Branch:</h2>
+            <select id="branch-select">
+                <option id="branch" value="">Central</option>
+                <option id="branch" value="">Shadle Park</option>
+                <option id="branch" value="">Liberty Park</option>
+                <option id="branch" value="">Hillyard</option>
+                <option id="branch" value="">The Hive</option>
+                <option id="branch" value="">South Hill</option>
+                <option id="branch" value="">Indian Trail</option>
+            </select>
+        </div>
+        <div id="aqi-legend-container">
+            <img id="aqi-legend" src="../assets/AQI-legend.png">
+        </div>
+    </div>
+
+    <div id="bottom-navigation">
+        <a href="index.html" class="bottom-nav-href"><button class="bottom-nav-butt">Current AQI</button></a>
+        <a href="this-branch.html" class="bottom-nav-href"><button class="bottom-nav-butt">This Branch</button></a>
+        <a href="map.html" id="this-page" class="bottom-nav-href"><button class="bottom-nav-butt">Map</button></a>
+        <a href="compare-cities.html" class="bottom-nav-href"><button class="bottom-nav-butt">How Do We Compare?</button></a>
+        <a href="historical-data.html" class="bottom-nav-href"><button class="bottom-nav-butt">A Look Into<br>The Past</button></a>
+    </div>
+
+    <style>
+        .iframe,
+        #myIframe {
+            position:fixed; 
+            top:-70px; 
+            left:0px; 
+            bottom:0px; 
+            right:auto; 
+            width:100%;
+            height:calc(120vh + 140px); /*using calc*/
+            border:none; 
+            margin:0; 
+            padding:0;
+            overflow:hidden;
+            z-index:1;
+            background:blue;
+    
+        }
+        #bot-cover {
+            background-color: white;
+            position: absolute;
+            top:100px;
+            width: 100vw;
+            height: 100px;
+        }
+    </style>
+    <div class="iframe">
+        <div id="bot-cover"></div>
+        <iframe id="myIframe" src="https://gispub.epa.gov/airnow/?showgreencontours=false&xmin=-14433985.99978488&xmax=-11758078.51357814&ymin=5369877.787183969&ymax=6355609.703949341">
+        </iframe>
+    </div>
+</body>
+</html>

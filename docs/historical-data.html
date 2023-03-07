@@ -1,0 +1,468 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+    <title>Live AQI</title>
+
+    <link rel="stylesheet" type="text/css" href="../style/navigation.css">
+    <style>
+        /* CONTENT */
+        #content-container {
+            width:100vw;
+            height:calc(100vh - 59px - 64px);
+            /* padding-top:75px; */
+            margin-top: min(30%,25vh,50px);
+            display: flex;
+            flex-direction: column;
+            flex-wrap: nowrap;
+            flex-basis: 100%;
+            justify-content: center;
+        }
+
+        #content-top,
+        #content-center,
+        #content-bottom {
+            margin-left:5%;
+            padding-left:10%;
+            display:flex;
+            height: fit-content;
+            margin:1vmin;
+        }
+        /* CENTER CONTENT */
+
+        #day-container,
+        #month-container,
+        #year-container {
+            background-color: aliceblue;
+            border-radius: 1000px;
+            min-height: 50px;
+            min-width: 50px;
+            width: calc(15vmin + 5vh);
+            height: calc(15vmin + 5vh);
+        }
+        /* #content-center {
+            -webkit-transition:  -webkit-transform .2s ease-out;
+            -moz-transition: -moz-transform .2s ease-out;
+            -o-transition: -o-transform .2s ease-out;
+            -ms-transition: -ms-transform .2s ease-out; 
+            transition: transform .2s ease-out; 
+        }
+        #content-center:hover {
+            -webkit-transform:scale(2);
+            -moz-transform:scale(2);
+            -o-transform:scale(2);
+            transform:scale(2);
+        } */
+        @-webkit-keyframes animScaleUp {
+            0% {
+                -webkit-transform: scale(1);
+                padding-left: 10%;
+                /* visibility: hidden; */
+                border:0px;
+                background-color: transparent;
+            }
+            100% {
+                -webkit-transform: scale(1.3);
+                padding-left: 17.5%;
+                /* visibility: visible; */
+                border: 10px;
+                background-color: white;
+            }
+        }
+        /* @-webkit-keyframes animScaleDown {
+            0% {
+                -webkit-transform: scale(1.3);
+                visibility: hidden;
+                opacity: 0;
+            }
+            100% {
+                -webkit-transform: scale(1);
+                visibility: visible;
+                opacity: 1;
+            }
+        } */
+        #content-top:hover,
+        #content-center:hover,
+        #content-bottom:hover {
+            -webkit-animation: animScaleUp 1.5s ease-in-out;
+            animation-fill-mode: forwards;
+            -webkit-animation-fill-mode: forwards;
+            z-index: 10;
+            /* border-color: white; */
+            /* background-color: white; */
+            /* -webkit-transition:  -webkit-transform .3s ease-out;
+            -moz-transition: -moz-transform .3s ease-out;
+            -o-transition: -o-transform .3s ease-out;
+            -ms-transition: -ms-transform .3s ease-out; 
+            transition: transform .3s ease-out; 
+            -webkit-transform:scale(1.5);
+            -moz-transform:scale(1.5);
+            -o-transform:scale(1.5);
+            transform:scale(1.5); */
+            /* padding: 2%;
+            padding-left: 20.8%; */
+        }
+
+        #AQI-day,
+        #AQI-month,
+        #AQI-year {
+            text-align: center;
+            /* text-justify: auto; */
+            /* align-items: center;
+            justify-content: center; */
+            /* align-items: center; */
+            padding-top: 15%;
+            font-size:max(16px,5vmin);
+        }
+
+        #day-text,
+        #month-text,
+        #year-text  {
+            visibility: hidden;
+        }
+
+        .content-title {
+            margin-left:30px;
+            padding-left: 5%;
+            padding-right: 5%;
+            /* background-color: white; */
+            border-radius: 20%;
+            font-size: max(10px,2.5vh);
+            justify-content: center;
+            align-items: center;
+            z-index: 3;
+        }
+
+        .supplemental-text {
+            position: absolute;
+            background-color: aliceblue;
+            padding:10px;
+            border-radius: 100px;
+            transform: translateY(-20px);
+            z-index: 2;
+        }
+
+        #question {
+            width: 30px;
+            height: 30px;
+            background-color: aliceblue;
+            border-radius: 1000px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* @-webkit-keyframes fadeInFromNone {
+            0% {
+                display: none;
+                background: rgba(0,0,0,0.0);
+            }
+
+            1% {
+                display: block;
+                background: rgba(0,0,0,0.1);
+            }
+
+            100% {
+                display: block;
+                background: rgba(0,0,0,0.5);
+            }
+        } */
+
+        /*
+        San serif
+        NOT ARIEL
+        */
+
+        #graph-container {
+            position: absolute;
+            left:max(55vw,350px);
+            top:10%;
+        }
+
+        #month-graph,
+        #year-graph {
+            width:max(250px,30vw);
+            visibility: hidden;
+        }
+
+        #month-graph {
+            transform: translateY(-15vh);
+        }
+        
+        #year-graph {
+            transform: translateY(-30vh);
+        }
+
+        .background {
+            position:absolute;
+            background-color: black;
+            opacity: 20%;
+            width:100vw;
+            height:100vh;
+            left:0;
+            top:0;
+            visibility: hidden;
+        }
+
+        @-webkit-keyframes idleAnim {
+            0% {
+                -webkit-transform: scale(1);
+            }
+            30% {
+                -webkit-transform: scale(1.3);
+            }
+            100% {
+                -webkit-transform: scale(1);
+            }
+        }
+
+        #day-container.animate,
+        #month-container.animate,
+        #year-container.animate {
+            -webkit-animation: idleAnim 5s ease-in-out;
+            /* -webkit-animation-iteration-count: infinite; */
+            animation-fill-mode: forwards;
+            -webkit-animation-fill-mode: forwards;
+        }
+    </style>
+
+    <script src="../scripts/AQI-legend-script.js"></script>
+    <script>
+        window.onload = function () {
+            let secondsIdle = 0;
+            window.setInterval(incrementIdleTimer, 1000);
+            console.log(secondsIdle);
+
+            document.body.addEventListener('mouseover', function() {
+                secondsIdle = 0;
+                unAnimateBubbles();
+            });
+
+            function incrementIdleTimer() {
+                secondsIdle++;
+                console.log(secondsIdle);
+
+                if( secondsIdle%5 == 0 ) {
+                    animateBubbles();
+                }
+            }
+
+            legendEventHandling();
+
+            let todayButt = document.getElementById("set-day-AQI");
+            let monthButt = document.getElementById("set-month-AQI");
+            let yearButt = document.getElementById("set-year-AQI");
+
+            todayButt.addEventListener("click", function() {
+                var DayAQI = prompt("Set Day AQI", DayAQI);
+                setAQIStyle(0,DayAQI);
+            });
+
+            monthButt.addEventListener("click", function() {
+                var MonthAQI = prompt("Set Month AQI", MonthAQI);
+                setAQIStyle(1,MonthAQI);
+            });
+
+            yearButt.addEventListener("click", function() {
+                var YearAQI = prompt("Set Year AQI", YearAQI);
+                setAQIStyle(2,YearAQI);
+            });
+
+
+            // let whole_content = document.getElementById("content-container");
+            let top = document.getElementById("content-top");
+            let center = document.getElementById("content-center");
+            let bottom = document.getElementById("content-bottom");
+            let dayDiv = document.getElementById("day-container");
+            let monthDiv = document.getElementById("month-container");
+            let yearDiv = document.getElementById("year-container");
+            let dayText = document.getElementById("day-text");
+            let monthText = document.getElementById("month-text");
+            let yearText = document.getElementById("year-text");
+
+            let monthGraph = document.getElementById("month-graph");
+            let yearGraph = document.getElementById("year-graph");
+            let background = document.getElementsByClassName("background");
+
+            let aqiDayVal = document.getElementById("AQI-day");
+            let aqiMonthVal = document.getElementById("AQI-month");
+            let aqiYearVal = document.getElementById("AQI-year");
+
+
+            setAQIStyle(0,150);
+            setAQIStyle(1,20);
+            setAQIStyle(2,200);
+
+            function setAQIStyle(loc, aqi) {
+                if( loc == 0 ) {
+                    aqiDayVal.textContent = aqi;
+                    dayDiv.style.background = setAQIColor(aqi);
+                } else if( loc == 1 ) {
+                    aqiMonthVal.textContent = aqi;
+                    monthDiv.style.background = setAQIColor(aqi);
+                } else {
+                    aqiYearVal.textContent = aqi;
+                    yearDiv.style.background = setAQIColor(aqi);
+                }
+            }
+
+            function setAQIColor(AQI) {
+                if( AQI < 50 ) {
+                    return "#00e400";
+                } else if( AQI >= 50 && AQI < 100 ) {
+                    return "#ffff00";
+                } else if( AQI >= 100 && AQI < 150 ) {
+                    return "#ff7e00";
+                } else if( AQI >= 150 && AQI < 200 ) {
+                    return "#ff0000";
+                } else if( AQI >= 200 && AQI < 300 ) {
+                    return "#8f3f97";
+                } else if( AQI >= 300 ) {
+                    return "#7e0023";
+                }
+            }
+
+            function animateBubbles() {
+                if( secondsIdle%30 == 5 ) {
+                    yearDiv.classList.remove('animate');
+                    dayDiv.classList.add('animate');
+                } else if( secondsIdle%30 == 10 ) {
+                    dayDiv.classList.remove('animate');
+                    monthDiv.classList.add('animate');
+                    // dayDiv.style.webkitAnimationDelay = "5s";
+                } else if( secondsIdle%30 == 15 ) {
+                    monthDiv.classList.remove('animate');
+                    yearDiv.classList.add('animate');
+                    // dayDiv.style.webkitAnimationDelay = "5s";
+                    // monthDiv.style.webkitAnimationDelay = "5s";
+                }
+            }
+
+            function unAnimateBubbles() {
+                dayDiv.classList.remove('animate');
+                monthDiv.classList.remove('animate');
+                yearDiv.classList.remove('animate');
+            }
+
+            top.addEventListener("mouseover", function() {
+                dayText.style.visibility = "visible";
+                background[1].style.visibility = "visible";
+            });
+
+            top.addEventListener("mouseout", function() {
+                dayText.style.visibility = "hidden";
+                background[1].style.visibility = "hidden";
+            });
+
+            center.addEventListener("mouseover", function() {
+                monthText.style.visibility = "visible";
+                background[2].style.visibility = "visible";
+                monthGraph.style.visibility = "visible";
+            });
+
+            center.addEventListener("mouseout", function() {
+                monthText.style.visibility = "hidden";
+                background[2].style.visibility = "hidden";
+                monthGraph.style.visibility = "hidden";
+            });
+
+            bottom.addEventListener("mouseover", function() {
+                yearText.style.visibility = "visible";
+                background[0].style.visibility = "visible";
+                yearGraph.style.visibility = "visible";
+            });
+
+            bottom.addEventListener("mouseout", function() {
+                yearText.style.visibility = "hidden";
+                background[0].style.visibility = "hidden";
+                yearGraph.style.visibility = "hidden";
+            });
+        }
+
+    </script>
+</head>
+
+<body>
+    <div id="top-navigation">
+        <div id="branch-select-container">
+            <h2>Branch:</h2>
+            <select id="branch-select">
+                <option id="branch" value="">Central</option>
+                <option id="branch" value="">Shadle Park</option>
+                <option id="branch" value="">Liberty Park</option>
+                <option id="branch" value="">Hillyard</option>
+                <option id="branch" value="">The Hive</option>
+                <option id="branch" value="">South Hill</option>
+                <option id="branch" value="">Indian Trail</option>
+            </select>
+        </div>
+        <button id="set-day-AQI">Set Today</button>
+        <button id="set-month-AQI">Set Month</button>
+        <button id="set-year-AQI">Set Year</button>
+        <div id="aqi-legend-container">
+            <img id="aqi-legend" src="../assets/AQI-legend.png">
+        </div>
+    </div>
+
+    <div id="bottom-navigation">
+        <a href="index.html" class="bottom-nav-href"><button class="bottom-nav-butt">Current AQI</button></a>
+        <a href="this-branch.html" class="bottom-nav-href"><button class="bottom-nav-butt">This Branch</button></a>
+        <a href="map.html" class="bottom-nav-href"><button class="bottom-nav-butt">Map</button></a>
+        <a href="compare-cities.html" class="bottom-nav-href"><button class="bottom-nav-butt">How Do We Compare?</button></a>
+        <a href="historical-data.html" id="this-page" class="bottom-nav-href"><button class="bottom-nav-butt">A Look Into<br>The Past</button></a>
+    </div>
+    
+    <div id="content-container">
+        <div id="content-top">
+            <div id="day-container">
+                <h1 id="AQI-day">---</h1>
+            </div>
+            
+            <div class="content-title">
+                <h1>Today Average</h1>
+                <h4 class="supplemental-text" id="day-text">Average updated<br>every 15 minutes</h4>
+            </div>
+            <div class="background"></div>
+        </div>
+
+        <div id="content-center">
+            <div id="month-container">
+                <h1 id="AQI-month">---</h1>
+            </div>
+            <div class="content-title">
+                <h1>February Average</h1>
+                <h4 class="supplemental-text" id="month-text">Daily averages for<br>the current month</h4>
+            </div>
+            <!-- <div id="question">
+                <h2 id="question-mark">?</h2>
+            </div> -->
+            <div id="graph-container">
+                <img id="month-graph" src="../images/graph-sample.png">
+            </div>
+            <div class="background"></div>
+        </div>
+        <div id="content-bottom">
+            <div id="year-container">
+                <h1 id="AQI-year">---</h1>
+            </div>
+            <div class="content-title">
+                <h1 >2023 Average</h1>
+                <h4 class="supplemental-text" id="year-text">Monthly averages<br>for the current year</h4>
+            </div>
+            <!-- <div id="question">
+                <h2>?</h2>
+            </div> -->
+            <div class="background"></div>
+            <div id="graph-container">
+                <img id="year-graph" src="../images/graph-sample.png">
+            </div>
+        </div>
+
+        <!-- <div id="content-right">
+            <h1>Hi</h1>
+        </div> -->
+        
+    </div>
+</body>
+</html>

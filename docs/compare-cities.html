@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+
+<html lang="en">
+
+<head>
+    <title>Live AQI</title>
+
+    <link rel="stylesheet" type="text/css" href="../style/navigation.css">
+    <style>
+        /* CONTENT */
+        #content-container {
+            width:100vw;
+            height:calc(100vh - 59px - 64px);
+            padding-top:75px;
+            display: flex;
+            flex-direction: row;
+            flex-wrap: nowrap;
+            flex-basis: 100%;
+            align-items: center;
+            padding-left: 5%;
+            padding-right: 5%;
+        }
+
+        .city-widget {
+            width: auto;
+            height: min(400px,55vh);
+        }
+
+        /*
+        San serif
+        NOT ARIEL
+        */
+    </style>
+
+    <script src="../scripts/AQI-legend-script.js"></script>
+    <!-- <script>
+        window.onload = function () {
+            legendEventHandling();
+        }
+    </script> -->
+</head>
+
+<body>
+    <div id="top-navigation">
+        <div id="branch-select-container">
+            <h2>Branch:</h2>
+            <select id="branch-select">
+                <option id="branch" value="">Central</option>
+                <option id="branch" value="">Shadle Park</option>
+                <option id="branch" value="">Liberty Park</option>
+                <option id="branch" value="">Hillyard</option>
+                <option id="branch" value="">The Hive</option>
+                <option id="branch" value="">South Hill</option>
+                <option id="branch" value="">Indian Trail</option>
+            </select>
+        </div>
+        <div id="aqi-legend-container">
+            <img id="aqi-legend" src="../assets/AQI-legend.png">
+        </div>
+    </div>
+
+    <div id="bottom-navigation">
+        <a href="index.html" class="bottom-nav-href"><button class="bottom-nav-butt">Current AQI</button></a>
+        <a href="this-branch.html" class="bottom-nav-href"><button class="bottom-nav-butt">This Branch</button></a>
+        <a href="map.html" class="bottom-nav-href"><button class="bottom-nav-butt" id="nav-map">Map</button></a>
+        <a href="compare-cities.html" id="this-page" class="bottom-nav-href"><button class="bottom-nav-butt">How Do We Compare?</button></a>
+        <a href="historical-data.html" class="bottom-nav-href"><button class="bottom-nav-butt">A Look Into<br>The Past</button></a>
+    </div>
+    
+    <div id="content-container">
+        <img class="city-widget" src="../images/Screenshot (187).png">
+        <img class="city-widget" src="../images/Screenshot (187).png">
+        <img class="city-widget" src="../images/Screenshot (187).png">
+        <!-- <webview src="https://widget.airnow.gov/aq-dial-widget/?city=TriCities&state=WA&country=USA" style="height:340px; width:230px; border: none; border-radius: 25px;"></webview>
+        <iframe title="Example 1" height="340" width="230" src="https://widget.airnow.gov/aq-dial-widget/?city=Seattle&state=WA&country=USA" style="border: none; border-radius: 25px;"></iframe> -->
+        <iframe class="city-widget" title="Example 1" height="340" width="230" src="https://widget.airnow.gov/aq-dial-widget/?city=Coeur%20d%27Alene&state=ID&country=USA" style="border: none; border-radius: 25px;"></iframe>
+        <!-- <iframe title="Example Primary Pollutant" height="230" width="230" src="http://widget.airnow.gov/aq-dial-widget-primary-pollutant/?city=Raleigh&state=NC&country=USA" style="border: none; border-radius: 25px;"></iframe> -->
+    </div>
+</body>
+</html>
