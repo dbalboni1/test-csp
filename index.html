@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+    <title>Live AQI</title>
+    <!-- <script>
+
+        //XML http request
+        window.onload = function () {
+            //FOR DEBUGGING PURPOSES
+            //false = manually set AQI (default for debugging)
+            //true = make API request
+            const APIRequest = false;
+
+            let AQI;
+
+            //update AQI button event listener
+            document.getElementById("getAQI")
+                        .addEventListener("click",setAQI)
+
+            //Interprets APIRequest Setting & sets AQI
+            function setAQI() {
+                if( APIRequest ) {
+                    //Make API Request
+                    if( confirm("Are you sure you want to make an API request?") ) {
+                        console.log("Method: API Request");
+                        makeAPIRequest();
+                    }
+                } else {
+                    //Set AQI or PM manually - for debugging
+                    console.log("Method: Manual")
+
+                    /**/
+                    //SET AQI
+                    AQI = prompt("Set AQI", AQI);
+                    console.log("PM2.5: N/A");
+                    console.log("AQI: " + AQI);
+                    /**/
+
+                    //OR
+
+                    /*
+                    //SET PM - rounded to nearest tenth
+                    var PM = Math.round(prompt("Set PM", PM)*10)/10;
+                    console.log("PM2.5: " + PM);
+                    calcAQIFromPM(PM);
+                    console.log("AQI: " + AQI);
+                    /**/
+
+                    //Set Text & Color
+                    setAQIText();
+                    setAQIColor();
+                }
+            }
+
+            //Make API Request
+            //TODO: make API Key unaccessible by user (encryption?)
+            function makeAPIRequest() {
+                var request = new XMLHttpRequest();
+                request.open('GET', 'https://api.purpleair.com/v1/sensors/142696')
+                request.setRequestHeader('X-API-Key','19E223A3-3837-11ED-B5AA-42010A800006')
+                request.send();
+
+                request.onload = ()=>{
+                    const given = JSON.parse(request.response);
+                    console.log(given);
+                    console.log(given.sensor);
+
+                    //Get PM2.5 from json
+                    var PM = given.sensor.stats["pm2.5_10minute"];
+                    console.log("PM2.5: " + PM);
+
+                    //calculate AQI
+                    calcAQIFromPM(PM);
+                    console.log("AQI: " + AQI);
+
+                    //Set Text & Color
+                    setAQIText();
+                    setAQIColor();
+                }
+            }
+
+            //Calculates AQI value (using formula from link below)
+            //  - https://metone.com/how-to-calculate-aqi-and-nowcast-indices/
+            //TODO: Fix this formula for ALT cf=3 (Purple Air's default)
+            //  - https://docs.google.com/document/d/15ijz94dXJ-YAZLi9iZ_RaBwrZ4KtYeCy08goGBwnbCU/edit#heading=h.ned1i0ha07d6
+            function calcAQIFromPM(pm) {
+                //DO NOT CHANGE TABLE
+                const table = [
+                    [0.0, 12.0, 0, 50],
+                    [12.1, 35.4, 51, 100],
+                    [35.5, 55.4, 101, 150],
+                    [55.5, 150.4, 151, 200],
+                    [150.5, 250.4, 201, 300],
+                    [250.5, 500.4, 301, 500],
+                ];
+
+                //formula for calc AQI
+                const computeAqi = (concI, [concLo, concHi, aqiLo, aqiHi]) =>
+                    Math.round(
+                    ((concI - concLo) / (concHi - concLo)) * (aqiHi - aqiLo) + aqiLo
+                    );
+
+                //find table values where (pm > low && pm <= high)
+                const values = table.find(([concLo, concHi, aqiLo, aqiHi]) => (pm >= concLo && pm <= concHi));
+
+                //Set AQI (max 500)
+                AQI = values ? computeAqi(pm, values) : 500;
+            }
+
+            //------STYLE SECTION------
+            function setAQIText() {
+                document.getElementById("AQI").textContent = AQI;
+            }
+
+            //TODO: fix colors to match PurpleAir
+            function setAQIColor() {
+                var color = document.getElementById("guage-color")
+
+                if( AQI < 50 ) {
+                    color.style.filter = "hue-rotate(60deg)";
+                } else if( AQI >= 50 && AQI < 100 ) {
+                    color.style.filter = "hue-rotate(0deg)";
+                } else if( AQI >= 100 && AQI < 150 ) {
+                    color.style.filter = "hue-rotate(-60deg)";
+                } else if( AQI >= 150 && AQI < 200 ) {
+                    color.style.filter = "hue-rotate(-70deg)";
+                } else if( AQI >= 200 && AQI < 300 ) {
+                    color.style.filter = "hue-rotate(250deg)";
+                } else if( AQI >= 300 ) {
+                    color.style.filter = "sepia(100%) ";
+                }
+            }
+
+            let legendVisible = false;
+            let aqiLegend = document.getElementById("aqi-legend");
+            aqiLegend.addEventListener("click",function() {
+                if( legendVisible == false ) {
+                    aqiLegend.src = "../assets/AQI-legend1.jpg";
+                    legendVisible = true
+                    console.log("legend");
+                } else {
+                    aqiLegend.src = "../assets/AQI-legend.jpg";
+                    legendVisible = false;
+                    console.log("base");
+                }
+                console.log("click");
+            });
+        }
+    </script> -->
+    
+    <meta charset="utf-8" />    
+    <link rel="stylesheet" type="text/css" href="test-csp/style/navigation.css">
+    <style>
+        /* CONTENT */
+        #content-container {
+            width:100vw;
+            height:calc(100vh - 59px - 64px);
+            padding-top:59px;
+            display: flex;
+            flex-direction: row;
+            flex-wrap: nowrap;
+            flex-basis: 100%;
+        }
+
+        /* LEFT CONTENT */
+        #content-left {
+            margin-top: 5%;
+            margin-left: 10%;
+            width:50vw;
+            justify-items: center;
+            padding-bottom: 20px;
+        }
+
+        /* RIGHT CONTENT */
+        #content-right {
+            width: 50vw;
+            padding-top: 50px;
+            margin-right: 20px;
+            min-width: 200px;
+        }
+        #right-title {
+            padding-left: 15%;
+        }
+        #right-body {
+            padding-left:10%;
+        }
+
+        /* .aq-title {
+            position: -webkit-sticky;
+            margin-top: -10vh;
+        } */
+
+        /*
+        San serif
+        ariel: last choice
+        */
+    </style>
+    <link rel="stylesheet" href="../style/dial-widget.css">
+      <!-- <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0];var j=d.createElement(s);var dl=l!='dataLayer'?'&amp;l='+l:'';j.src='https://www.googletagmanager.com/gtm.js?id='+i+dl+'';j.async=true;f.parentNode.insertBefore(j,f);})(window,document,'script','dataLayer','GTM-L8ZB');</script> -->
+    
+    <script src="../scripts/AQI-legend-script.js"></script>
+    <script>
+        window.onload = function() {
+            legendEventHandling();
+            
+            const MAX_ROTATION_DEGREES = 180;
+            const MIN_ROTATION_DEGREES = 0;
+
+            let aqiSet = 10;
+
+            //BUTTON FOR DEV PURPOSES
+            document.getElementById("getAQI")
+                        .addEventListener("click",buttSetAQI)
+
+            function buttSetAQI() {
+                aqiSet = prompt("Set AQI", aqiSet);
+                setAQI(aqiSet);
+            }
+            //-------------------
+
+            
+            //Set AQI base at 10
+            //TODO: hook up to database
+            setAQI(10);
+            
+            function setAQI(aqi) {
+                let deg = getDegree(aqi);
+                setDegree(deg);
+
+                let aqiVal = document.getElementsByClassName("aq-aqi-value");
+                aqiVal[0].innerHTML = aqi;
+
+                setColorAndText(aqi);
+            }
+
+            function getDegree(aqi) {
+                let deg;
+                // AQI values 0 - 200 represent the first 4/6 of the dial
+                if (aqi <= 200) {
+                deg = (aqi / 200) * (MAX_ROTATION_DEGREES * (4/6));
+                }
+                // AQI values 201 - 300 represent the second to last 1/6 of the dial
+                else if (aqi <= 300) {
+                deg = (MAX_ROTATION_DEGREES * (4/6)) + ((((aqi-200) / (300-200))) * (MAX_ROTATION_DEGREES * (1/6)))
+                }
+                // AQI values 301 - 500 represent the last 1/6 of the dial
+                else if (aqi <= 500) {
+                deg = (MAX_ROTATION_DEGREES * (5/6)) + ((((aqi-300) / (500-300))) * (MAX_ROTATION_DEGREES * (1/6)))
+                }
+                // AQI values above 400 should just be treated as the maximum rotation
+                else {
+                deg = MAX_ROTATION_DEGREES;
+                }
+                return deg;
+            }
+
+            // Rotates the arrow to the provided degrees.  Degree values capped at 0 and 180
+            function setDegree(deg) {
+                // Ensure we do not rotate too far in either direction
+                deg = Math.max(MIN_ROTATION_DEGREES, Math.min(deg, MAX_ROTATION_DEGREES));
+                // Apply the rotation
+                let arrows = document.getElementsByClassName("aq-dial-arrow");
+                for (let i = 0; i < arrows.length; i++) {
+                    let arrow = arrows[i];
+                    arrow.style.webkitTransform = "rotate("+deg+"deg)";
+                    arrow.style.mozTransform = "rotate("+deg+"deg)";
+                    arrow.style.msTransform = "rotate("+deg+"deg)";
+                    arrow.style.oTransform = "rotate("+deg+"deg)";
+                    arrow.style.transform = "rotate("+deg+"deg)";
+                    //background.style.position = "10px";
+                }
+            }
+
+            function setColorAndText(aqi) {
+                let colorDiv = document.getElementsByClassName("aq-dial-widget");
+                let lowerText = document.getElementsByClassName("aq-title");
+                let innerText = document.getElementsByClassName("aq-aqi-container");
+
+                if( aqi <= 50 ) {
+                    colorDiv[0].style.backgroundImage = "url('../images/dial_good.svg')";
+                    lowerText[0].innerHTML = "Good";
+                    innerText[0].style.color = "black";
+                } else if( aqi <= 100 ) {
+                    colorDiv[0].style.backgroundImage = "url('../images/dial_moderate.svg')";
+                    lowerText[0].innerHTML = "Moderate";
+                    innerText[0].style.color = "black";
+                } else if( aqi <= 150 ) {
+                    colorDiv[0].style.backgroundImage = "url('../images/dial_usg.svg')";
+                    lowerText[0].innerHTML = "Unhealthy for Sensitive Groups";
+                    innerText[0].style.color = "white";
+                } else if( aqi <= 200 ) {
+                    colorDiv[0].style.backgroundImage = "url('../images/dial_unhealthy.svg')";
+                    lowerText[0].innerHTML = "Unhealthy";
+                    innerText[0].style.color = "white";
+                } else if( aqi <= 300 ) {
+                    colorDiv[0].style.backgroundImage = "url('../images/dial_very_unhealthy.svg')";
+                    lowerText[0].innerHTML = "Very Unhealthy";
+                    innerText[0].style.color = "white";
+                } else {
+                    colorDiv[0].style.backgroundImage = "url('../images/dial_hazardous.svg')";
+                    lowerText[0].innerHTML = "Hazardous";
+                    innerText[0].style.color = "white";
+                }
+            }
+        }
+    </script>
+</head>
+
+<body>
+    <div id="top-navigation">
+        <div id="branch-select-container">
+            <h2>Branch:</h2>
+            <select id="branch-select">
+                <option id="branch" value="">Central</option>
+                <option id="branch" value="">Shadle Park</option>
+                <option id="branch" value="">Liberty Park</option>
+                <option id="branch" value="">Hillyard</option>
+                <option id="branch" value="">The Hive</option>
+                <option id="branch" value="">South Hill</option>
+                <option id="branch" value="">Indian Trail</option>
+            </select>
+        </div>
+        <button id="getAQI">Set Current AQI</button>
+        <div id="aqi-legend-container">
+            <img id="aqi-legend" src="../assets/AQI-legend.png">
+        </div>
+    </div>
+
+    <div id="bottom-navigation">
+        <a href="index.html" id="this-page" class="bottom-nav-href"><button class="bottom-nav-butt">Current AQI</button></a>
+        <a href="this-branch.html" class="bottom-nav-href"><button class="bottom-nav-butt">This Branch</button></a>
+        <a href="map.html" class="bottom-nav-href"><button class="bottom-nav-butt">Map</button></a>
+        <a href="compare-cities.html" class="bottom-nav-href"><button class="bottom-nav-butt">How Do We Compare?</button></a>
+        <a href="historical-data.html" class="bottom-nav-href"><button class="bottom-nav-butt">A Look Into<br>The Past</button></a>
+    </div>
+    
+    <div id="content-container">
+        <div id="content-left">
+            <div class="aq-dial-widget" role="main">
+                <img class="aq-dial-background" src="../images/dial_black_circle_top_bigger.svg" alt="background top half"/>
+                <img class="aq-dial-background2" src="../images/dial_black_circle_bottom_smaller.svg" alt="background bottom half" />
+                <div class="aq-dial-container">
+                    <img class="aq-dial-meter" src="../images/dial_legend.svg" alt="dial legend" />
+                    <div class="trim">
+                        <img class="aq-dial-arrow" src="../images/dial_arrow_full_rounded.svg" alt="dial arrow" />
+                    </div>
+                    <div class="aq-dial-status"></div>
+                    <div class="aq-dial-data" id="container">
+                        <div class="aq-aqi-container">
+                            <span>
+                                <div class="aq-aqi-value">10</div>
+                            </span>
+                        </div>
+                        <div class="aq-title-container">
+                            <!-- <span class="aq-title">Good</span> -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+        </div>
+        <div id="content-right">
+            <h1 id="right-title">Current AQI Value</h1>
+            <h3 id="right-body">Data gathered from sensors at this location!</h3>
+        </div>
+    </div>
+</body>
+</html>
